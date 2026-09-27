@@ -1,0 +1,23 @@
+{
+  "name": "eve_health",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@eve_health/db": "workspace:*",
+    "@prisma/adapter-libsql": "^7.10.0",
+    "@prisma/client": "^7.10.0",
+    "@types/express": "^5.0.6",
+    "express": "^5.2.1",
+    "prisma": "^8.0.0-rc.17"
+  }
+}

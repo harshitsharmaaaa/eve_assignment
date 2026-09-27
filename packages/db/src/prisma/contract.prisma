@@ -1,0 +1,55 @@
+// use prisma-8
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String
+  bookings     Booking[]
+  createdAt    DateTime  @default(now())
+}
+
+model DiagnosticCentre {
+  id       String           @id @default(uuid())
+  name     String
+  location String
+  tests    DiagnosticTest[]
+}
+
+model DiagnosticTest {
+  id       String           @id @default(uuid())
+  name     String
+  price    Decimal
+  centreId String
+  centre   DiagnosticCentre @relation(fields: [centreId], references: [id])
+  bookings Booking[]
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+  CANCELLED
+}
+
+model Booking {
+  id            String          @id @default(uuid())
+  userId        String
+  user          User            @relation(fields: [userId], references: [id])
+  testId        String
+  test          DiagnosticTest  @relation(fields: [testId], references: [id])
+  appointmentAt DateTime
+  amount        Decimal
+  status        BookingStatus   @default(PENDING)
+  payment       Payment?
+  createdAt     DateTime        @default(now())
+}
+
+model Payment {
+  id          String   @id @default(uuid())
+  bookingId   String   @unique
+  booking     Booking  @relation(fields: [bookingId], references: [id])
+  status      String
+  providerRef String   @unique
+  rawEvent    Json?
+  processedAt DateTime @default(now())
+}
