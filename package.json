@@ -3,11 +3,17 @@
   "module": "index.ts",
   "type": "module",
   "private": true,
+  "scripts": {
+    "start": "bun src/index.ts",
+    "seed": "bun prisma/seed.ts",
+    "test": "bun test tests/ --timeout 30000"
+  },
   "workspaces": [
     "packages/*"
   ],
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "@types/swagger-ui-express": "^4.1.8"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -17,7 +23,15 @@
     "@prisma/adapter-libsql": "^7.10.0",
     "@prisma/client": "^7.10.0",
     "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "bcrypt": "^6.0.0",
+    "bcryptjs": "^3.0.3",
     "express": "^5.2.1",
-    "prisma": "^8.0.0-rc.17"
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "prisma": "^8.0.0-rc.17",
+    "swagger-ui-express": "^5.0.1",
+    "temporal-polyfill": "^1.0.5",
+    "zod": "^4.6.5"
   }
 }
