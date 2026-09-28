@@ -1,0 +1,33 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: eve_health
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/eve_health
+      PORT: 3000
+      JWT_SECRET: changeme-in-production
+      JWT_EXPIRY: 1h
+    depends_on:
+      db:
+        condition: service_healthy
+    command: sh -c "bun --cwd packages/db prisma db init && bun prisma/seed.ts && bun src/index.ts"
+
+volumes:
+  pgdata:
