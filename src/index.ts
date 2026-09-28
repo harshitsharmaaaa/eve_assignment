@@ -1,9 +1,6 @@
-import {client} from "@eve_health/db";
+import {app} from "./server";
 
-
-const user = await client.orm.public.User.create({
-    email: "enzo@eve.com",
-    passwordHash: "test",
+const port = Number(process.env.PORT || 3000);
+app.listen(port, () => {
+    console.log("Server is running on port " + port);
 });
-
-console.log(user);
