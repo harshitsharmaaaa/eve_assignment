@@ -10,13 +10,13 @@
     "contract:emit": "prisma contract emit"
   },
   "dependencies": {
-    "@prisma/orm-postgres": "^8.0.0-rc.12",
+    "@prisma/orm-postgres": "8.0.0-rc.12",
     "dotenv": "^18.0.4",
     "temporal-polyfill": "^1.0.5"
   },
   "devDependencies": {
     "@prisma/cli-engine": "0.6.1",
     "@types/node": "^26.6.3",
-    "prisma": "^8.0.0-rc.17"
+    "prisma": "8.0.0-rc.17"
   }
 }
