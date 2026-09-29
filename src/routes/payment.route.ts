@@ -75,12 +75,15 @@ paymentroute.post("/webhook",validate(paymentWebhook),async (req,res)=>{
                 if(existing){
                     return {payment:existing,alreadyPaid:true};
                 }
-                throw new AppError(409,"Conflict","Booking already paid or cancelled");
+                return {payment:null,alreadyPaid:true,conflict:true};
             }
             const created = await tx.orm.public.Payment.create({bookingId,status,providerRef:eventId});
             await tx.orm.public.Booking.where({id:bookingId}).update({status:status==="SUCCESS" ? "CONFIRMED" : "FAILED"});
             return {payment:created,alreadyPaid:false};
         });
+        if(result.conflict){
+            throw new AppError(409,"Conflict","Booking already paid or cancelled");
+        }
         const fresh = await client.orm.public.Booking.where({id:bookingId}).first();
         res.status(200).json({ok:true,deduped:result.alreadyPaid,payment:result.payment,booking:fresh});
     }
