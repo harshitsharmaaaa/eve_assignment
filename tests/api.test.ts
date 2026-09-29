@@ -169,4 +169,19 @@ describe("webhook",()=>{
         const fresh = await client.orm.public.Booking.where({id:booking.id}).first();
         expect(fresh!.status).toBe("CONFIRMED");
     });
+
+    test("webhook for a cancelled booking creates no payment",async ()=>{
+        const u = await signup(mail());
+        const {booking} = await setupBooking(u.token);
+        const cancelled = await fetch(base + "/bookings/" + booking.id + "/cancel",{method:"POST",headers:{Authorization:"Bearer " + u.token}});
+        expect(cancelled.status).toBe(200);
+        const eventId = "evt_" + Date.now() + "_cancelled";
+        const payload = {eventId,bookingId:booking.id,status:"SUCCESS"};
+        const res = await fetch(base + "/payments/webhook",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});
+        expect(res.status).toBe(409);
+        const rows = await client.orm.public.Payment.where({bookingId:booking.id}).all();
+        expect(rows.length).toBe(0);
+        const fresh = await client.orm.public.Booking.where({id:booking.id}).first();
+        expect(fresh!.status).toBe("CANCELLED");
+    });
 });
