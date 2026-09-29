@@ -54,7 +54,7 @@ paymentroute.post("/",requireAuth,validate(makePayment),async (req,res)=>{
     }
 });
 
-// providerRef has a unique constraint so the same eventId can never create two payments.
+
 paymentroute.post("/webhook",validate(paymentWebhook),async (req,res)=>{
     const {eventId,bookingId,status} = req.body;
     const seen = await client.orm.public.Payment.where({providerRef:eventId}).first();
