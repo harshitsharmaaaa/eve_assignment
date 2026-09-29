@@ -4,7 +4,7 @@ import {client} from "@eve_health/db";
 import bcrypt from "bcryptjs";
 import {validate} from "../middlewares/validate";
 import {signToken} from "../lib/jwt";
-import {AppError} from "../lib/error";
+import {AppError,isDuplicate}from "../lib/error";
 
 export const authroute = Router();
 
@@ -18,21 +18,29 @@ authroute.post("/signup",validate(credentials),async (req,res)=>{
     const {email,password} = req.body;
     const alreadyExists = await client.orm.public.User.first({email});
     if(alreadyExists){
-        return res.status(400).json({message:"User already exists"});
+        throw new AppError(409,"Conflict","User already exists");
     }
-    const user = await client.orm.public.User.create({email,passwordHash:await bcrypt.hash(password,10)});
-    res.status(201).json({id:user.id,email:user.email,token:signToken(user)});
+    try{
+        const user = await client.orm.public.User.create({email,passwordHash:await bcrypt.hash(password,10)});
+        res.status(201).json({id:user.id,email:user.email,token:signToken(user)});
+    }
+    catch(e){
+        if(isDuplicate(e)){
+            throw new AppError(409,"Conflict","User already exists");
+        }
+        throw e;
+    }
 });
 
 authroute.post("/login",validate(credentials),async (req,res)=>{
     const {email,password} = req.body;
     const user = await client.orm.public.User.first({email});
     if(!user){
-        return res.status(400).json({message:"Invalid email or password"});
+        throw new AppError(401,"UnauthorizedError","Invalid email or password");
     }
     const isValid = await bcrypt.compare(password,user.passwordHash);
     if(!isValid){
-        throw new AppError(400,"UnauthorizedError","Invalid email or password");
+        throw new AppError(401,"UnauthorizedError","Invalid email or password");
     }
     res.status(200).json({id:user.id,email:user.email,token:signToken(user)});
 });

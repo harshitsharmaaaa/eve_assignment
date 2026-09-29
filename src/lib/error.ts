@@ -15,3 +15,8 @@ export const BadRequestError =(msg:string)=> new AppError(400,"BadRequest",msg);
 export const ValidationError =(msg:string)=> new AppError(400,"ValidationError",msg);
 export const ForbiddenError =(msg:string)=> new AppError(403,"Forbidden",msg);
 export const ConflictError =(msg:string)=> new AppError(409,"Conflict",msg);
+
+export function isDuplicate(e:any){
+    const msg = String(e?.message || "");
+    return msg.includes("duplicate key") || msg.includes("unique constraint") || msg.includes("UNIQUE");
+}

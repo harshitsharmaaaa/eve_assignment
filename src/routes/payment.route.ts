@@ -1,9 +1,9 @@
 import {Router} from "express";
 import {z} from "zod";
 import {client} from "@eve_health/db";
-import {AppError} from "../lib/error";
-import {requireAuth} from "../lib/auth";
-import {validate} from "../middlewares/validate";
+import {AppError,isDuplicate}from "../lib/error";
+import {requireAuth}from "../lib/auth";
+import {validate}from "../middlewares/validate";
 
 export const paymentroute = Router();
 
@@ -17,11 +17,6 @@ export const paymentWebhook = z.object({
     bookingId:z.string().min(1),
     status:z.enum(["SUCCESS","FAILED"]),
 });
-
-function isDuplicate(e:any){
-    const msg = String(e?.message || "");
-    return msg.includes("duplicate key") || msg.includes("unique constraint") || msg.includes("UNIQUE");
-}
 
 paymentroute.post("/",requireAuth,validate(makePayment),async (req,res)=>{
     const {bookingId,force} = req.body;
